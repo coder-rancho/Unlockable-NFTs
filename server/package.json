@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "author": "Naman Vyas",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^5.7.1",
+    "express": "^4.18.1"
+  }
 }
