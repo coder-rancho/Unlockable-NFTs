@@ -1,11 +1,23 @@
 const express = require('express')
 const ethers = require('ethers')
+const mongoose = require('mongoose')
+const { uploadFile, downloadFile} = require("./scripts/gridfs")
+
+require("dotenv").config()
+
 const app = express()
 const port = 8000
+const MONGO_DB_URI = process.env.MONGO_DB_ATLAS_URI
+
+
+async function main() {
+  await mongoose.connect(MONGO_DB_URI).then( _ => console.log("Connected to mongodb"))
+
+}
 
 const verifyMessage = async ({ message, address, signature }) => {
     try {
-      const signerAddr = await ethers.utils.verifyMessage(message, signature);
+      const signerAddr = ethers.utils.verifyMessage(message, signature);
       if (signerAddr !== address) {
         return false;
       }
@@ -17,29 +29,58 @@ const verifyMessage = async ({ message, address, signature }) => {
     }
 };
 
-app.get('/', async (req, res) => {
-  let message = req.query.nftAddress + req.query.tokenId
-  let address = req.query.address
-  let signature = req.query.signature
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+// app.post()
 
-  if (!message || !address || !signature) {
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * @reqBody {address} nft 
+ * @reqBody {address} user
+ * @reqBody {hash} signature User will sign the NFT's address and generate a signature.
+ */
+app.post("/getNFT", async (req, res) => {
+
+  const {
+    nft,
+    user,
+    signature
+  } = req.body;
+
+  if (!nft || !user || !signature) {
     res.send("Invalid request!!")
-    return
+    return;
   }
 
-  let isValidUser = await verifyMessage({message, address, signature})
+  const isOwner = verifyMessage(nft, user, signature);
 
-  if (isValidUser) {
-    /* TODO */
-    // fetch image from mongodb nftAdress -> tokenId = link_to_image.
-    res.send("file/image link")
-  } else {
-    res.send("You're not authorized to access this NFT.")
-  }
+  // Todo: Retrive file from mongodb and send to the user.
+  if (isOwner) res.sendFile()
+  else res.send("You're not the authorised owner.")
+
 })
+
 
 
 
 app.listen(port, () => {
+  console.clear()
   console.log(`App is running on port: ${port}`)
 })
+
+
+main().catch(err => console.log(err))

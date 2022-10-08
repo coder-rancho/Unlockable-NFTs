@@ -5,7 +5,9 @@
   "author": "Naman Vyas",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "ethers": "^5.7.1",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "mongoose": "^6.6.5"
   }
 }
