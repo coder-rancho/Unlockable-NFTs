@@ -1,0 +1,1 @@
+1. Delete files from database, if no nft is minted against it

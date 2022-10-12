@@ -1,36 +1,36 @@
-var mongoose = require('mongoose');
-var fs = require('fs');
+const mongoose = require('mongoose');
+const fs = require('fs');
+const { BUCKET_NAME, DOWNLOAD_PATH } = require("../config")
+const { deleteFile } = require("../utils/fileHandling");
+const path = require('path');
 
 
-async function uploadFile() {
-
-    // console.log(mongoose.connection.db)
+async function uploadFile(file) {
 
     var gridfsbucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db,{
-        chunkSizeBytes:1024,
-        bucketName:'filesBucket'
+        bucketName: BUCKET_NAME
     });
 
-    fs.createReadStream("./temp.txt")
-        .pipe(gridfsbucket.openUploadStream('temp.txt'))
+    fs.createReadStream(file.path)
+        .pipe(gridfsbucket.openUploadStream(file.filename))
         .on('error', ()=>{
             console.log("Some error occured:"+error);
         })
         .on('finish', (result)=>{
             console.log("done uploading");
             console.log(result)
+            deleteFile(file.path)
         });
 }
 
-async function downloadFile() {
+async function downloadFile(filename) {
 
     var gridfsbucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db,{
-        chunkSizeBytes:1024,
-        bucketName:'filesBucket'
+        bucketName: BUCKET_NAME
     });
 
-    gridfsbucket.openDownloadStreamByName('temp.txt')
-        .pipe(fs.createWriteStream('./sample-download.txt'))
+    gridfsbucket.openDownloadStreamByName(filename)
+        .pipe(fs.createWriteStream(path.join(DOWNLOAD_PATH, filename)))
         .on('error', ()=>{
             console.log("Some error occurred in download:"+error);
         })
