@@ -1,12 +1,14 @@
-const hre = require("hardhat")
+const {ethers} = require("hardhat");
 
 async function main() {
-    const MyToken = await hre.ethers.getContractFactory("MyToken")
-    const myToken = await MyToken.deploy()
+    
+    const MarketPlace = await ethers.getContractFactory("Marketplace")
+    const marketplace = await MarketPlace.deploy()
 
-    await myToken.deployed()
+    await marketplace.deployed()
 
-    console.log(myToken.address)
+    console.log(marketplace.address)
+    
 }
 
 main()
