@@ -1,60 +1,61 @@
+//> ---------- PACKAGES ----------------------------------------------
 const express = require('express')
 const ethers = require('ethers')
 const mongoose = require('mongoose')
-const { uploadFile, /*downloadFile*/} = require("./utils/gridfs")
-const { verifyMessage } = require("./utils/signature")
-const { upload } = require("./middlewares/multer")
-const { downloadFile } = require("./middlewares/gridfs")
-const { DOWNLOAD_PATH } = require("./config")
 const path = require("path")
+
+//> ---------- MIDDLEWARES ------------
+const { upload } = require("./middlewares/multer")
+const { downloadFile, uploadFile } = require("./middlewares/gridfs")
+
+//> ---------- UTILS ------------------
+const { verifyMessage } = require("./utils/signature")
 const { deleteFile } = require('./utils/fileHandling')
 
+//> ---------- CONFIGS ----------------
+const { DOWNLOAD_PATH } = require("./config")
+const Nft = require("./models/nft")
+
+
+
+
+//> ------- Global Variables -------------
+const app = express();
 require("dotenv").config()
-
-const app = express()
-const port = 8000
-const MONGO_DB_URI = process.env.MONGO_DB_ATLAS_URI
+const PORT = process.env.PORT || 8000
+const MONGO_DB_URI = process.env.MONGO_DB_ATLAS_URI || "mongodb://localhost:27017/test"
 
 
+//> ------- Global Middlewares -------------
+app.use(express.urlencoded({extended: true}))
+app.use(express.json())
 
 
+
+
+// ---------- main() ------------------
 async function main() {
-  console.log("Connecting to database...");
-  await mongoose.connect(MONGO_DB_URI).then( _ => console.log("Connected to database."))
-
+    console.log("Connecting to database...")
+    await mongoose.connect(MONGO_DB_URI, _ => console.log(`Connected to database.`))
 }
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
-app.post("/upload", upload.single("image"), (req, res) => {
-  const file = req.file;
-  uploadFile(file)
-  res.send(file.filename)
-})
 
+
+
+
+// -------------------- ROUTES --------------------------
 /**
  * 
  * 
  * 
+ * 
+ * 
+ * 
+ * 
+ * Todo: Check the implementation after inserting data.
  */
-app.get("/download", downloadFile, async (req, res) => {
-  const filepath = path.join(DOWNLOAD_PATH, req.query.filename)
-  res.download(filepath, (err) => {
-    if (err) {
-      console.log(err)
-    } else {
-      deleteFile(filepath)
-    }
-  })
+app.get('/', (req, res) => {
+    
 })
 
 /**
@@ -63,10 +64,15 @@ app.get("/download", downloadFile, async (req, res) => {
  * 
  * 
  * 
+ * Todo: Upload High res image and low res image
+ * Todo: save both image's objectId in NFTs collection
+ * Todo: Set an Event Listener to check for nft creation and update the nftAddress value.
  * 
- * 
+ *
  */
-// app.post()
+app.post("/uploadImage", upload.single("image"), uploadFile, (req, res) => {
+res.send(req.nftId)
+})
 
 /**
  * 
@@ -77,37 +83,20 @@ app.get("/download", downloadFile, async (req, res) => {
  * 
  * 
  * 
- * @reqBody {address} nft 
- * @reqBody {address} user
- * @reqBody {hash} signature User will sign the NFT's address and generate a signature.
  */
-app.post("/getNFT", async (req, res) => {
-
-  const {
-    nft,
-    user,
-    signature
-  } = req.body;
-
-  if (!nft || !user || !signature) {
-    res.send("Invalid request!!")
-    return;
-  }
-
-  const isOwner = verifyMessage(nft, user, signature);
-
-  // Todo: Retrive file from mongodb and send to the user.
-  if (isOwner) res.sendFile()
-  else res.send("You're not the authorised owner.")
-
+app.post("/downloadImage", (req, res) => {
+    const objId = req.body.objId;
+    const nftAdress = req.body.nftAdress
+    const signature = req.body.signature    // note: signature - sign(nftAddress)
 })
-
-
-
-
-
-app.listen(port, () => {
-  console.clear()
-  console.log(`App is running on port: ${port}`)
-  main().catch(err => console.log(err))
+/**
+ * 
+ * 
+ * 
+ * 
+ */
+console.clear()
+app.listen(PORT, () => {
+    console.log(`App is running on port: ${PORT}`)
+    main()
 })

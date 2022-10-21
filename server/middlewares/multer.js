@@ -1,27 +1,24 @@
-const { model } = require("mongoose")
 const multer = require("multer")
 const path = require("path")
-
-const imgDir = path.join(__dirname, "../images")
+const {IMAGES_FOLDER} =require("../config")
 
 const storageEngine = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, imgDir)
+      cb(null, IMAGES_FOLDER)
     },
     filename: function (req, file, cb) {
       const uniquePrefix = Date.now()
-      cb(null, uniquePrefix + "-" + file.originalname)
+      cb(null, uniquePrefix + "-" + file.originalname) // Note: filename format
     }
   })
 
 const upload = multer({
     storage: storageEngine,
     limits: {
-        fileSize: 10 * 1024 * 1024     //10 mb
+        fileSize: 10 * 1024 * 1024    // Note: fileSize Limit = 10mb
     }
 })
 
-module.exports = { 
-    upload,
-    imgDir
- }
+module.exports = {
+  upload
+}

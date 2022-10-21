@@ -16,8 +16,9 @@ async function generateLowResImg(file, dest, w = Jimp.AUTO, h = Jimp.AUTO) {
     const filepath = path.join(dest, name)
     await img.writeAsync(filepath)
     return {
-        name,
-        path: filepath
+        filename: name,
+        path: filepath,
+        type: "lowResImg"
     }
 }
 
