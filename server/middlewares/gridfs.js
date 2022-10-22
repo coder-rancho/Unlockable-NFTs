@@ -32,24 +32,26 @@ async function uploadFile(req, res, next) {
     next()
 }
 
-async function downloadFile(req, res, next) {
-  const filename = req.query.filename;
+async function sendFile(req, res, next) {
+  // Note: req.imgId should exist before calling the middleware
+  const imgId = req.imgId 
+  const filePath = path.join(DOWNLOAD_PATH, imgId.toString() + ".jpeg")
 
-  var gridfsbucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-    bucketName: BUCKET_NAME,
-  });
-
+  const gridfsbucket = getGridFsBucket()
   gridfsbucket
-    .openDownloadStreamByName(filename)
-    .pipe(fs.createWriteStream(path.join(DOWNLOAD_PATH, filename)))
+    .openDownloadStream(imgId)
+    .pipe(fs.createWriteStream(filePath))
     .on("error", () => {
       console.log("Some error occurred in download:" + error);
-      next();
+      next()
     })
     .on("finish", () => {
       console.log("Done downloading!!");
-      next();
-    });
+      res.sendFile(filePath, () => {
+        deleteFile(filePath)
+      })
+      next()
+    })
 }
 
 
@@ -64,25 +66,25 @@ function getGridFsBucket() {
 }
 
 async function uploadViaStream(file, nft) {
-    const gridFsBucket = getGridFsBucket()
+  const gridFsBucket = getGridFsBucket()
 
-    const fsReadable = fs.createReadStream(file.path)
-    const gridFsWritable = gridFsBucket.openUploadStream(file.filename)
+  const fsReadable = fs.createReadStream(file.path)
+  const gridFsWritable = gridFsBucket.openUploadStream(file.filename)
 
-    fsReadable.pipe(gridFsWritable)
-    .on("error", _ => console.log(error))
-    .on("finish", (res) => {
-        console.log(`${file.filename} is Uploaded.`)
-        
-        if (file.type === "lowResImg") {
-            nft.lowResImgId = res._id
-        } else {
-            nft.highResImgId = res._id
-        }
-        nft.save()
-        console.log("Updated DB.")
-        deleteFile(file.path)
-    })
+  fsReadable.pipe(gridFsWritable)
+  .on("error", _ => console.log(error))
+  .on("finish", (res) => {
+      console.log(`${file.filename} is Uploaded.`)
+      
+      if (file.type === "lowResImg") {
+          nft.lowResImgId = res._id
+      } else {
+          nft.highResImgId = res._id
+      }
+      nft.save()
+      console.log("Updated DB.")
+      deleteFile(file.path)
+  })
 }
 
 
@@ -92,24 +94,24 @@ async function uploadViaStream(file, nft) {
 //> ----------- Exports --------------------
 module.exports = {
     uploadFile,
-    downloadFile
+    sendFile
 }
 
 
 
 
 //> ------------ Testing --------------------
-// async function test() {
+async function test() {
 
-//     await mongoose.connect("")
+  require("dotenv").config()
 
-//     uploadFile({
-//         file: {
-//             filename: "MyTestFile.jpeg",
-//             path: "C:\\Users\\Dell\\Desktop\\Unlockable-NFTs\\server\\images\\downloads\\img-2.jpg"
-//         }
-//     }, {}, null)
+  mongoose.connect(process.env.MONGO_DB_ATLAS_URI)
 
+  sendFile({
+    body: {
+      nftId: '6352959a5bf8bfac853ca287'
+    }
+  }, null, null)
 
-// }
+}
 // test()

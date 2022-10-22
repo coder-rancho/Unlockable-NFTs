@@ -6,7 +6,10 @@ const path = require("path")
 
 //> ---------- MIDDLEWARES ------------
 const { upload } = require("./middlewares/multer")
-const { downloadFile, uploadFile } = require("./middlewares/gridfs")
+const {
+    uploadFile,
+    sendFile
+} = require("./middlewares/gridfs")
 
 //> ---------- UTILS ------------------
 const { verifyMessage } = require("./utils/signature")
@@ -52,11 +55,32 @@ async function main() {
  * 
  * 
  * 
- * Todo: Check the implementation after inserting data.
+ * 
  */
-app.get('/', (req, res) => {
-    
+app.get("/", async (req, res) => {
+    const nfts = await Nft.find({}).exec()
+    const nftIds = []
+
+    nfts.forEach(nft => {
+        nftIds.push(nft._id)
+    })
+    res.send(nftIds)
 })
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+app.get('/image/:nftId', async (req, res, next) => {
+    const nft = await Nft.findById(req.params.nftId)
+    req.imgId = nft.lowResImgId
+    next()
+}, sendFile, () => {})
 
 /**
  * 
@@ -64,11 +88,9 @@ app.get('/', (req, res) => {
  * 
  * 
  * 
- * Todo: Upload High res image and low res image
- * Todo: save both image's objectId in NFTs collection
- * Todo: Set an Event Listener to check for nft creation and update the nftAddress value.
  * 
- *
+ * 
+ * Todo: Set an Event Listener to check for nft creation and update the nftAddress value.
  */
 app.post("/uploadImage", upload.single("image"), uploadFile, (req, res) => {
 res.send(req.nftId)
@@ -82,13 +104,16 @@ res.send(req.nftId)
  * 
  * 
  * 
- * 
+ * Todo: Create the middleware to verify signature
  */
-app.post("/downloadImage", (req, res) => {
-    const objId = req.body.objId;
-    const nftAdress = req.body.nftAdress
-    const signature = req.body.signature    // note: signature - sign(nftAddress)
-})
+app.post("/downloadImage", /* verify_sign, */ async (req, res, next) => {
+    // const objId = req.body.objId;
+    // const nftAdress = req.body.nftAdress
+    // const signature = req.body.signature    // note: signature - sign(nftAddress)
+    const nft = await Nft.findById(req.body.nftId).exec()
+    req.imgId = nft.highResImgId
+    next()
+}, sendFile, () => {})
 /**
  * 
  * 
