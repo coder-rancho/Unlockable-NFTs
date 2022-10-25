@@ -3,6 +3,7 @@ const express = require('express')
 const ethers = require('ethers')
 const mongoose = require('mongoose')
 const path = require("path")
+const cors = require("cors")
 
 //> ---------- MIDDLEWARES ------------
 const { upload } = require("./middlewares/multer")
@@ -10,6 +11,7 @@ const {
     uploadFile,
     sendFile
 } = require("./middlewares/gridfs")
+const { verifySign } = require("./middlewares/blockchain")
 
 //> ---------- UTILS ------------------
 const { verifyMessage } = require("./utils/signature")
@@ -32,6 +34,7 @@ const MONGO_DB_URI = process.env.MONGO_DB_ATLAS_URI || "mongodb://localhost:2701
 //> ------- Global Middlewares -------------
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
+app.use(cors())
 
 
 
@@ -104,9 +107,9 @@ res.send(req.nftId)
  * 
  * 
  * 
- * Todo: Create the middleware to verify signature
+ * Todo: Create the middleware to verify owner
  */
-app.post("/downloadImage", /* verify_sign, */ async (req, res, next) => {
+app.post("/downloadImage", /*verifyOwner,* verifySign,*/ async (req, res, next) => {
     // const objId = req.body.objId;
     // const nftAdress = req.body.nftAdress
     // const signature = req.body.signature    // note: signature - sign(nftAddress)

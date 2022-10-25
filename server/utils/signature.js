@@ -1,4 +1,6 @@
-const verifyMessage = async ({ message, address, signature }) => {
+const ethers = require("ethers")
+
+const verifyMessage = ({ message, address, signature }) => {
     try {
       const signerAddr = ethers.utils.verifyMessage(message, signature);
       if (signerAddr !== address) {
@@ -8,7 +10,7 @@ const verifyMessage = async ({ message, address, signature }) => {
       return true;
     } catch (err) {
       console.log(err);
-      return false;
+      throw "Bad request"
     }
 };
 

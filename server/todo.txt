@@ -1,1 +1,5 @@
 1. Delete files from database, if no nft is minted against it
+2. Set http status code for bad request for all routes.
+3. Implement Exception handling 
+4. Document code
+5. Write tests
