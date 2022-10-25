@@ -25,9 +25,9 @@ async function verifySign(req, res, next) {
     }
 }
 
-// Todo: 
+// Todo: Implement the function "isOwnerOfNft(userAddress, nftAddress)" inside ./utils/blockchain.js
 async function verifyOwner(req, res, next) {
-    
+
 }
 
 module.exports = {

@@ -10,7 +10,7 @@ contract NFT is ERC721, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    mapping (address => bool) isHolder;
+    mapping (address => bool) public isHolder;
 
     constructor() ERC721("NFT", "NFT") {}
 
