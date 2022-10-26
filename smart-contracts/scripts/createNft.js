@@ -10,8 +10,9 @@ const contract = new ethers.Contract("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
 
 const main = async () => {
     
+    const nftId = uri
 
-    const tx = await contract.createNFT("https://www.google.com", ethers.utils.parseUnits("1", "ether"))
+    const tx = await contract.createNFT(uri, ethers.utils.parseUnits("1", "ether"))
 
     await tx.wait()
 
