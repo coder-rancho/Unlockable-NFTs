@@ -7,11 +7,8 @@ const cors = require("cors")
 
 //> ---------- MIDDLEWARES ------------
 const { upload } = require("./middlewares/multer")
-const {
-    uploadFile,
-    sendFile
-} = require("./middlewares/gridfs")
-const { verifySign } = require("./middlewares/blockchain")
+const { uploadFile, sendFile } = require("./middlewares/gridfs")
+const { verifyOwner, verifySign } = require("./middlewares/blockchain")
 
 //> ---------- UTILS ------------------
 const { verifyMessage } = require("./utils/signature")
@@ -43,6 +40,7 @@ app.use(cors())
 async function main() {
     console.log("Connecting to database...")
     await mongoose.connect(MONGO_DB_URI, _ => console.log(`Connected to database.`))
+
 }
 
 
@@ -77,7 +75,7 @@ app.get("/", async (req, res) => {
  * 
  * 
  * 
- * 
+ *
  */
 app.get('/image/:nftId', async (req, res, next) => {
     const nft = await Nft.findById(req.params.nftId)
@@ -107,11 +105,13 @@ res.send(req.nftId)
  * 
  * 
  * 
- * Todo: Create the middleware to verify owner
+ * 
+ * 
  */
-app.post("/downloadImage", /*verifyOwner,* verifySign,*/ async (req, res, next) => {
-    // const objId = req.body.objId;
+app.post("/downloadImage", verifyOwner, verifySign, async (req, res, next) => {
+    // const nftId = req.body.nftId;
     // const nftAdress = req.body.nftAdress
+    // const userAddress = req.body.userAddress
     // const signature = req.body.signature    // note: signature - sign(nftAddress)
     const nft = await Nft.findById(req.body.nftId).exec()
     req.imgId = nft.highResImgId

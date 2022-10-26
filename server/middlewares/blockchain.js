@@ -1,4 +1,5 @@
 const { verifyMessage } = require("../utils/signature")
+const { isOwnerOfNft } = require("../utils/blockchain")
 
 async function verifySign(req, res, next) {
     try {
@@ -25,9 +26,17 @@ async function verifySign(req, res, next) {
     }
 }
 
-// Todo: Implement the function "isOwnerOfNft(userAddress, nftAddress)" inside ./utils/blockchain.js
 async function verifyOwner(req, res, next) {
-
+    try {
+        if ( isOwnerOfNft(req.body.userAddress, req.body.nftAddress) ) {
+            next()
+        } else {
+            res.status(401).send("user is not the owner of the nft")
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(400).send(err)
+    }
 }
 
 module.exports = {
