@@ -5,7 +5,7 @@ import "./NFT.sol";
 
 contract Marketplace {
 
-    event NftCreated(address indexed nft, address indexed creator);
+    event NftCreated(address indexed nft, address indexed creator, string uri);
     event PriceUpdated(address indexed nft, uint newPrice);
     event NftBought(address indexed nft, uint atPrice);
 
@@ -43,7 +43,7 @@ contract Marketplace {
         details.priceInWei = _priceInWei;
         detailsOf[address(newNft)] = details;
 
-        emit NftCreated(address(newNft) , msg.sender);
+        emit NftCreated(address(newNft) , msg.sender, _uri);
         emit PriceUpdated( address(newNft), _priceInWei);
     }
 
