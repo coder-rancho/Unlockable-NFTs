@@ -6,7 +6,7 @@ const ABI = [
 
 const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/") //default
 const signer = provider.getSigner() 
-const contract = new ethers.Contract("0x5fbdb2315678afecb367f032d93f642f64180aa3", ABI, signer)
+const contract = new ethers.Contract("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", ABI, signer)
 
 const main = async () => {
     
