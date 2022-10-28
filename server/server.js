@@ -13,6 +13,7 @@ const { verifyOwner, verifySign } = require("./middlewares/blockchain")
 //> ---------- UTILS ------------------
 const { verifyMessage } = require("./utils/signature")
 const { deleteFile } = require('./utils/fileHandling')
+const { eventListeners } = require("./utils/eventListener")
 
 //> ---------- CONFIGS ----------------
 const { DOWNLOAD_PATH } = require("./config")
@@ -39,7 +40,11 @@ app.use(cors())
 // ---------- main() ------------------
 async function main() {
     console.log("Connecting to database...")
-    await mongoose.connect(MONGO_DB_URI, _ => console.log(`Connected to database.`))
+    mongoose.connect(MONGO_DB_URI, _ => {
+        console.log(`Connected to database.`)
+        // Note: Calling this function inside the callback because database should be connected in prior
+        eventListeners.nftCreated()
+    })
 
 }
 
@@ -78,7 +83,7 @@ app.get("/", async (req, res) => {
  *
  */
 app.get('/image/:nftId', async (req, res, next) => {
-    const nft = await Nft.findById(req.params.nftId)
+    const nft = await Nft.findById(req.params.nftId).exec()
     req.imgId = nft.lowResImgId
     next()
 }, sendFile, () => {})
@@ -91,10 +96,13 @@ app.get('/image/:nftId', async (req, res, next) => {
  * 
  * 
  * 
- * Todo: Set an Event Listener to check for nft creation and update the nftAddress value.
+ *
  */
-app.post("/uploadImage", upload.single("image"), uploadFile, (req, res) => {
-res.send(req.nftId)
+app.post("/uploadImage", upload.single("image"), uploadFile, async (req, res) => {
+    const nft = await Nft.findById(req.nftId).exec()
+    nft.creator = req.body.userAddress
+    await nft.save()
+    res.send(req.nftId)
 })
 
 /**

@@ -3,3 +3,5 @@
 3. Implement Exception handling 
 4. Document code
 5. Write tests
+6. Setup required param check middleware
+7. update all ABI fragments to point to universal ABI object (explore etherscan api)
