@@ -17,7 +17,7 @@ module.exports = {
 
 
 const test = async() => {
-    const nft = '0xCafac3dD18aC6c6e92c921884f9E4176737C052c'
+    const nft = '0x603E1BD79259EbcbAaeD0c83eeC09cA0B89a5bcC'
     const owner = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
 
     console.log(await isOwnerOfNft(owner, nft))

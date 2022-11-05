@@ -1,8 +1,6 @@
-//> ---------- PACKAGES ----------------------------------------------
+//> ---------- PACKAGES ---------------
 const express = require('express')
-const ethers = require('ethers')
 const mongoose = require('mongoose')
-const path = require("path")
 const cors = require("cors")
 
 //> ---------- MIDDLEWARES ------------
@@ -11,18 +9,15 @@ const { uploadFile, sendFile } = require("./middlewares/gridfs")
 const { verifyOwner, verifySign } = require("./middlewares/blockchain")
 
 //> ---------- UTILS ------------------
-const { verifyMessage } = require("./utils/signature")
-const { deleteFile } = require('./utils/fileHandling')
 const { eventListeners } = require("./utils/eventListener")
 
 //> ---------- CONFIGS ----------------
-const { DOWNLOAD_PATH } = require("./config")
 const Nft = require("./models/nft")
 
 
 
 
-//> ------- Global Variables -------------
+//> ------- Global Variables ------------
 const app = express();
 require("dotenv").config()
 const PORT = process.env.PORT || 8000
@@ -98,10 +93,7 @@ app.get('/image/:nftId', async (req, res, next) => {
  * 
  *
  */
-app.post("/uploadImage", upload.single("image"), uploadFile, async (req, res) => {
-    const nft = await Nft.findById(req.nftId).exec()
-    nft.creator = req.body.userAddress
-    await nft.save()
+app.post("/uploadImage", upload.single("image"), uploadFile, (req, res) => {
     res.send(req.nftId)
 })
 

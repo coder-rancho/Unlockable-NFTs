@@ -1,6 +1,17 @@
+//> ---------- PACKAGES ---------------
+//> ---------- UTILS ------------------
 const { verifyMessage } = require("../utils/signature")
 const { isOwnerOfNft } = require("../utils/blockchain")
 
+
+
+//> ------------ FUNCTIONS ------------
+/**
+ * @summary verify the digital signature
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 async function verifySign(req, res, next) {
     try {
         if (

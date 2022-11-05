@@ -9,7 +9,7 @@ async function main() {
 }
 
 const privateKey = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
-const message = "0xCafac3dD18aC6c6e92c921884f9E4176737C052c"
+const message = "0x603E1BD79259EbcbAaeD0c83eeC09cA0B89a5bcC"
 
 
 main()

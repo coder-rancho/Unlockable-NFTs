@@ -11,7 +11,7 @@ const contract = new ethers.Contract("0x5FbDB2315678afecb367f032d93F642f64180aa3
 const main = async () => {
 
     const options = {value: ethers.utils.parseEther("1.0")}
-    const tx = await contract.buyNft('0xB7A5bd0345EF1Cc5E66bf61BdeC17D2461fBd968', options)
+    const tx = await contract.buyNft('0x603E1BD79259EbcbAaeD0c83eeC09cA0B89a5bcC', options)
     await tx.wait()
 
     console.log(tx)
