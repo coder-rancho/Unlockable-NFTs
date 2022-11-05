@@ -61,9 +61,9 @@ async function sendFile(req, res, next) {
     })
     .on("finish", () => {
       console.log("Done downloading!!");
-      // res.sendFile(filePath, () => {
-      //   deleteFile(filePath)
-      // })
+      res.sendFile(filePath, () => {
+        deleteFile(filePath)
+      })
       next()
     })
 }
