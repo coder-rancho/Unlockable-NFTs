@@ -38,31 +38,31 @@ async function sendFile(req, res, next) {
   const filePath = path.join(DOWNLOAD_PATH, imgId.toString() + ".jpeg")
 
   const gridfsbucket = getGridFsBucket()
-  gridfsbucket
-    .openDownloadStream(imgId)
-    .pipe(fs.createWriteStream(filePath))
-    .on("error", () => {
-      console.log("Some error occurred in download:" + error);
-      next()
-    })
-    .on("finish", () => {
-      console.log("Done downloading!!");
-      res.sendFile(filePath, () => {
-        deleteFile(filePath)
-      })
-      next()
-    })
   // gridfsbucket
   //   .openDownloadStream(imgId)
-  //   .pipe(res)
+  //   .pipe(fs.createWriteStream(filePath))
   //   .on("error", () => {
   //     console.log("Some error occurred in download:" + error);
   //     next()
   //   })
   //   .on("finish", () => {
-  //     console.log("File sent successfully!!");
+  //     console.log("Done downloading!!");
+  //     res.sendFile(filePath, () => {
+  //       deleteFile(filePath)
+  //     })
   //     next()
   //   })
+  gridfsbucket
+    .openDownloadStream(imgId)
+    .pipe(res)
+    .on("error", () => {
+      console.log("Some error occurred in download:" + error);
+      next()
+    })
+    .on("finish", () => {
+      console.log("File sent successfully!!");
+      next()
+    })
 }
 
 
