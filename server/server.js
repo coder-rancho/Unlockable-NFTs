@@ -59,6 +59,7 @@ async function main() {
  * 
  */
 app.get("/", async (req, res) => {
+    console.log("Get Request for /")
     const nfts = await Nft.find({}).exec()
     const nftIds = []
 
